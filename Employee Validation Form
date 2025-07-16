@@ -1,0 +1,159 @@
+import React, { useState } from "react";
+
+function EmployeeValidationForm() {
+  const [fields, setFields] = useState({
+    name: "",
+    email: "",
+    employeeId: "",
+    joiningDate: ""
+  });
+
+  const [error, setError] = useState({
+    name: "Name must be at least 4 characters long and only contain letters and spaces",
+    email: "Email must be a valid email address",
+    employeeId: "Employee ID must be exactly 6 digits",
+    joiningDate: "Joining Date cannot be in the future"
+  });
+
+  const validateField = (name, value) => {
+    let errorMsg = "";
+    if (name === "name") {
+    if (!/^[A-Za-z\s]+$/.test(value) || value.trim().length < 4) {
+        errorMsg = "Name must be at least 4 characters long and only contain letters and spaces";
+    }
+}
+
+if (name === "email") {
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+        errorMsg = "Email must be a valid email address";
+    }
+}
+if (name === "employeeId") {
+    if (!/^\d{6}$/.test(value)) {
+        errorMsg = "Employee ID must be exactly 6 digits";
+    }
+}
+
+if (name === "joiningDate") {
+    const today = new Date().toISOString().split("T")[0];
+    if (value > today) {
+        errorMsg = "Joining Date cannot be in the future";
+    }
+}
+    setError((prev) => ({
+      ...prev,
+      [name]: errorMsg
+    }));
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFields((prev) => ({
+      ...prev,
+      [name]: value
+    }));
+    validateField(name, value);   // <-- must validate onChange
+};
+
+ const requiredFields = ["name", "email", "employeeId", "joiningDate"];
+
+  const isFormValid = () => {
+    const allFilled = requiredFields.every(
+      (field) => fields[field] && fields[field].trim() !== ""
+    );
+    const noErrors = requiredFields.every((field) => !error[field]);
+    return allFilled && noErrors;
+  };
+
+  const handleSubmit = () => {
+    console.log(error)
+    if (isFormValid()) {
+      setFields({
+        name: "",
+        email: "",
+        employeeId: "",
+        joiningDate: ""
+      });
+      setError({
+        name: "Name must be at least 4 characters long and only contain letters and spaces",
+        email: "Email must be a valid email address",
+        employeeId: "Employee ID must be exactly 6 digits",
+        joiningDate: "Joining Date cannot be in the future"
+      });
+    }
+  };
+
+return (
+    <div className="layout-column align-items-center mt-20 ">
+      <div className="layout-column align-items-start mb-10 w-50" data-testid="input-name">
+        <input
+          className="w-100"
+          type="text"
+          name="name"
+          placeholder="Name"
+          value={fields.name}
+          data-testid="input-name-test"
+          onChange={handleChange}
+        />
+        {error.name && (
+          <p className="error mt-2" style={{ fontSize: "12px", color: "red" }}>
+            {error.name}
+          </p>
+        )}
+      </div>
+
+      <div className="layout-column align-items-start mb-10 w-50" data-testid="input-email">
+        <input
+          className="w-100"
+          type="text"
+          name="email"
+          placeholder="Email"
+          value={fields.email}
+          onChange={handleChange}
+        />
+        {error.email && (
+          <p className="error mt-2" style={{ fontSize: "12px", color: "red" }}>
+            {error.email}
+          </p>
+        )}
+      </div>
+<div className="layout-column align-items-start mb-10 w-50" data-testid="input-employee-id">
+        <input
+          className="w-100"
+          type="text"
+          name="employeeId"
+          placeholder="Employee ID"
+          value={fields.employeeId}
+          onChange={handleChange}
+        />
+        {error.employeeId && (
+          <p className="error mt-2" style={{ fontSize: "12px", color: "red" }}>
+            {error.employeeId}
+          </p>
+        )}
+      </div>
+
+      <div className="layout-column align-items-start mb-10 w-50" data-testid="input-joining-date">
+        <input
+          className="w-100"
+          type="date"
+          name="joiningDate"
+          value={fields.joiningDate}
+          onChange={handleChange}
+          placeholder="Joining Date"
+        />
+        {error.joiningDate && (
+          <p className="error mt-2" style={{ fontSize: "12px", color: "red" }}>
+            {error.joiningDate}
+          </p>
+        )}
+</div>
+
+      <button data-testid="submit-btn" onClick={handleSubmit} type="submit" disabled={!isFormValid()}>
+        Submit
+      </button>
+    </div>
+  );
+}
+
+export default EmployeeValidationForm;
